@@ -1,0 +1,31 @@
+# Dynmap-PreciousStones configuration
+
+toggles:
+  update-seconds: 60                # How often the toggles are updated
+  hide-warring: true                # Hides members of clans while the clans are at war
+layer:
+  fields:
+    enable: true
+    update-seconds: 30              # How often the markers are updated
+    label: "PStone Fields"          # The label for the layer
+    layer-priority: 10              # Ordering priority in layer menu (higher shows on top)
+    hide-by-default: false          # Make layer hidden by default
+    min-zoom: 0                     # Set minimum zoom level when markers should be visible (0=default, any zoom)
+#don't remove anything from defaultstyle.  That'd be stupid
+defaultstyle:
+  icon: "preciousstones.default"
+  area_text: "<div class=\"infowindow\"><span style=\"font-size:120%;\">%type% %name%</span><br /> Owner <span style=\"font-weight:bold;\">%owner%</span><br /><span>%dimensions%</span><br /><span>%coords%</span></div>"
+  marker_text: "%owner% | %type% | %coords%"
+  strokeColor: "#FF0000"
+  strokeOpacity: 0.8
+  strokeWeight: 3
+  fillColor: "#FF0000"
+  fillOpacity: 0.35
+ #Use BLOCKID_STYLE for each pstone you want drawn differently
+ #anything not specified will use the defaultstyle values
+57_style:
+  strokeColor: "#00FFFF"
+  strokeOpacity: 0.1
+  strokeWeight: 5
+  fillColor: "#00fFF0"
+  fillOpacity: 0.05

@@ -1,0 +1,12 @@
+name: Dynmap-PreciousStones
+main: net.sacredlabyrinth.phaed.dynmap.preciousstones.DynmapPreciousStones
+version: 1.0
+author: phaed
+softdepend: [ dynmap, PreciousStones ]
+commands:
+  map:
+    description: Map commands
+    usage: Syntax error, verify the command usage and try again
+permissions:
+  simpleclans.map.toggle:
+    description: Can toggle map visibility
