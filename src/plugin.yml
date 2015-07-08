@@ -1,6 +1,6 @@
 name: Dynmap-PreciousStones
 main: net.sacredlabyrinth.phaed.dynmap.preciousstones.DynmapPreciousStones
-version: 1.0
+version: 1.1
 author: phaed
 softdepend: [ dynmap, PreciousStones ]
 commands:
