@@ -1,15 +1,15 @@
 package net.sacredlabyrinth.phaed.dynmap.preciousstones;
 
+import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
+import net.sacredlabyrinth.phaed.dynmap.preciousstones.layers.Fields;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.dynmap.DynmapAPI;
 import org.dynmap.markers.MarkerAPI;
-import net.sacredlabyrinth.phaed.dynmap.preciousstones.layers.Fields;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import net.sacredlabyrinth.Phaed.PreciousStones.PreciousStones;
 
 public class DynmapPreciousStones extends JavaPlugin
 {
@@ -34,16 +34,19 @@ public class DynmapPreciousStones extends JavaPlugin
 
         initDynmap();
         initPStones();
-        activate();
 
-        fields = new Fields();
+        if ( activate() )
+        	fields = new Fields();
+        else
+        	this.getPluginLoader().disablePlugin(this);
+
     }
 
-    public void activate()
+    public boolean activate()
     {
-        if (!dynmap.isEnabled() || !preciousstones.isEnabled())
+        if ( dynmap == null || preciousstones == null || !dynmap.isEnabled() || !preciousstones.isEnabled() )
         {
-            return;
+        	return false;
         }
 
         initApis();
@@ -52,9 +55,10 @@ public class DynmapPreciousStones extends JavaPlugin
         cfg = getConfig();
         cfg.options().copyDefaults(true);   /* Load defaults, if needed */
         this.saveConfig();  /* Save updates, if needed */
-        
+
         // set up layers
         info("version " + this.getDescription().getVersion() + " is activated");
+        return true;
     }
 
     public void onDisable()
@@ -141,5 +145,4 @@ public class DynmapPreciousStones extends JavaPlugin
 
 
     }
-
 }

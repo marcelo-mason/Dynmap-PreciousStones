@@ -8,5 +8,5 @@ commands:
     description: Map commands
     usage: Syntax error, verify the command usage and try again
 permissions:
-  simpleclans.map.toggle:
+  preciousstones.map.toggle:
     description: Can toggle map visibility

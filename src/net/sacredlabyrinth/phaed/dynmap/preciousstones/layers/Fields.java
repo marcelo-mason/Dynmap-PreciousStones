@@ -1,15 +1,11 @@
 package net.sacredlabyrinth.phaed.dynmap.preciousstones.layers;
 
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import net.sacredlabyrinth.Phaed.PreciousStones.FieldFlag;
+import net.sacredlabyrinth.Phaed.PreciousStones.field.Field;
+import net.sacredlabyrinth.Phaed.PreciousStones.field.FieldFlag;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.ForceFieldManager;
 import net.sacredlabyrinth.Phaed.PreciousStones.managers.SettingsManager;
-import net.sacredlabyrinth.Phaed.PreciousStones.vectors.Field;
-import net.sacredlabyrinth.phaed.dynmap.preciousstones.Helper;
 import net.sacredlabyrinth.phaed.dynmap.preciousstones.DynmapPreciousStones;
+import net.sacredlabyrinth.phaed.dynmap.preciousstones.Helper;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -18,7 +14,14 @@ import org.dynmap.markers.Marker;
 import org.dynmap.markers.MarkerIcon;
 import org.dynmap.markers.MarkerSet;
 
-public class Fields {
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+public class Fields
+{
 
     private final String MARKER_SET = "preciousstones.fields";
     private final String CONFIG = "layer.fields.";
@@ -41,11 +44,13 @@ public class Fields {
     private MarkerSet markerSet;
     private Map<String, Marker> markers = new HashMap<String, Marker>();
 
-    public Fields() {
+    public Fields()
+    {
         plugin = DynmapPreciousStones.getInstance();
         readConfig();
 
-        if (enable) {
+        if (enable)
+        {
             initMarkerSet();
             initDefaultIcon();
             initStylesAndIcons();
@@ -53,9 +58,9 @@ public class Fields {
         }
     }
 
-    private void readConfig() {
+    private void readConfig()
+    {
         FileConfiguration cfg = plugin.getCfg();
-
         enable = cfg.getBoolean(CONFIG + "enable");
         updateSeconds = Math.max(cfg.getInt(CONFIG + "update-seconds"), 2);
         label = cfg.getString(CONFIG + "label", LABEL);
@@ -66,18 +71,21 @@ public class Fields {
         default_style = new FieldStyle(cfg, "defaultstyle");
     }
 
-    private void initStylesAndIcons() {
+    private void initStylesAndIcons()
+    {
         FileConfiguration cfg = plugin.getCfg();
         SettingsManager sm = plugin.getPreciousStones().getSettingsManager();
-        List<Integer> lBlocks = sm.getFfBlocks();
+        List<LinkedHashMap<String, Object>> lBlocks = sm.getForceFieldBlocks();
         field_styles.clear();
         icons.clear();
-        for (int iType : lBlocks) {
-            String sType = iType + "_style";
+        for (LinkedHashMap<String, Object> iType : lBlocks)
+        {
+            String sType = iType.get("block") + "_style";
             FieldStyle fs = new FieldStyle(cfg, sType, default_style);
             field_styles.put(sType, fs);
             MarkerIcon this_icon = plugin.getMarkerApi().getMarkerIcon(fs.icon);
-            if (this_icon == null) {
+            if (this_icon == null)
+            {
                 this_icon = default_icon;
             }
 
@@ -85,30 +93,38 @@ public class Fields {
         }
     }
 
-    private void initDefaultIcon() {
+    private void initDefaultIcon()
+    {
         default_icon = plugin.getMarkerApi().getMarkerIcon("preciousstones.default");
 
-        if (default_icon == null) {
+        if (default_icon == null)
+        {
             InputStream stream = DynmapPreciousStones.class.getResourceAsStream("/images/default.png");
             default_icon = plugin.getMarkerApi().createMarkerIcon("preciousstones.default", "preciousstones.default", stream);
         }
 
-        if (default_icon == null) {
+        if (default_icon == null)
+        {
             DynmapPreciousStones.severe("Error creating icon");
         }
 
     }
 
-    private void initMarkerSet() {
+    private void initMarkerSet()
+    {
         markerSet = plugin.getMarkerApi().getMarkerSet(MARKER_SET);
 
-        if (markerSet == null) {
+        if (markerSet == null)
+        {
             markerSet = plugin.getMarkerApi().createMarkerSet(MARKER_SET, label, null, false);
-        } else {
+        }
+        else
+        {
             markerSet.setMarkerSetLabel(label);
         }
 
-        if (markerSet == null) {
+        if (markerSet == null)
+        {
             DynmapPreciousStones.severe("Error creating " + LABEL + " marker set");
             return;
         }
@@ -118,23 +134,29 @@ public class Fields {
         markerSet.setMinZoom(minZoom);
     }
 
-    private void scheduleNextUpdate(int seconds) {
+    private void scheduleNextUpdate(int seconds)
+    {
         plugin.getServer().getScheduler().cancelTask(task);
         task = plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, new Update(), seconds * 20);
     }
 
-    private class Update implements Runnable {
+    private class Update implements Runnable
+    {
 
-        public void run() {
-            if (!stop) {
+        public void run()
+        {
+            if (!stop)
+            {
                 updateMarkerSet();
                 scheduleNextUpdate(updateSeconds);
             }
         }
     }
 
-    public void cleanup() {
-        if (markerSet != null) {
+    public void cleanup()
+    {
+        if (markerSet != null)
+        {
             markerSet.deleteMarkerSet();
             markerSet = null;
         }
@@ -142,20 +164,24 @@ public class Fields {
         stop = true;
     }
 
-    private String getFieldPopup(AreaMarker m, Field f) {
+    private String getFieldPopup(AreaMarker m, Field f)
+    {
         FieldStyle as = field_styles.get(f.getTypeId() + "_style");
         String v = "<div class=\"regioninfo\">" + as.area_text_format + "</div>";
         return replaceSubstitutions(v, f);
     }
 
-    private String replaceSubstitutions(String sInput, Field f){
+    private String replaceSubstitutions(String sInput, Field f)
+    {
         String v = sInput;
         String sAllowed = "";
         List<String> allowed = f.getAllowed();
-        for (int i = 0; i < allowed.size() - 1; i++) {
+        for (int i = 0; i < allowed.size() - 1; i++)
+        {
             String s = allowed.get(i);
             sAllowed += s;
-            if (i < allowed.size() - 1) {
+            if (i < allowed.size() - 1)
+            {
                 sAllowed += ",";
             }
         }
@@ -168,61 +194,72 @@ public class Fields {
         v = v.replace("%coords%", "(" + loc.getBlockX() + "," + loc.getBlockY() + "," + loc.getBlockZ() + ")");
 
         String sDimensions;
-        if (f.hasFlag(FieldFlag.CUBOID)) {
+        if (f.hasFlag(FieldFlag.CUBOID))
+        {
             sDimensions = "" + (f.getMaxx() - f.getMinx() + 1) + "x" + (f.getMaxy() - f.getMiny() + 1) + "x" + (f.getMaxz() - f.getMinz() + 1);
-        } else {
+        }
+        else
+        {
             sDimensions = "" + ((f.getRadius() * 2) + 1) + "x" + f.getHeight() + "x" + ((f.getRadius() * 2) + 1);
         }
         v = v.replace("%dimensions%", sDimensions);
-        v = v.replace("%flags%", f.getFlagsAsString());
+        v = v.replace("%flags%", f.getFlagsModule().getFlagsAsString());
         return v;
     }
 
 
-    private void addStyle(AreaMarker m, Field f) {
+    private void addStyle(AreaMarker m, Field f)
+    {
 
         FieldStyle as = field_styles.get(f.getTypeId() + "_style");
 
-        if (as == null) {
+        if (as == null)
+        {
             as = default_style;
         }
 
         int sc = 0xFF0000;
         int fc = 0xFF0000;
-        try {
+        try
+        {
             sc = Integer.parseInt(as.strokecolor.substring(1), 16);
             fc = Integer.parseInt(as.fillcolor.substring(1), 16);
-        } catch (NumberFormatException nfx) {
+        }
+        catch (NumberFormatException nfx)
+        {
         }
         m.setLineStyle(as.strokeweight, as.strokeopacity, sc);
         m.setFillStyle(as.fillopacity, fc);
 
 
-
-
     }
 
-    private void handleFieldIcon(World world, Field field, Map<String, Marker> newMarkers) {
+    private void handleFieldIcon(World world, Field field, Map<String, Marker> newMarkers)
+    {
         String id = field.getId() + "_marker";
         Marker m = markers.remove(id);
         //If we're not showing this
-        if (!field.hasFlag(FieldFlag.DYNMAP_MARKER)) {
+        if (!field.hasFlag(FieldFlag.DYNMAP_MARKER))
+        {
             return;
         }
 
         //retrieve the markericon from the icons list.
         MarkerIcon icon = icons.get(field.getTypeId() + "_style");
         Location loc = field.getLocation();
-        FieldStyle fs= field_styles.get(field.getTypeId() + "_style");
+        FieldStyle fs = field_styles.get(field.getTypeId() + "_style");
         String replaced_markers = replaceSubstitutions(fs.marker_text_format, field);
 
 
         String description = Helper.colorToHTML(replaced_markers, "z-index=100000;");
 
 
-        if (m == null) {
+        if (m == null)
+        {
             m = markerSet.createMarker(id, description, true, world.getName(), loc.getX(), loc.getY(), loc.getZ(), icon, false);
-        } else {
+        }
+        else
+        {
             m.setLocation(world.getName(), loc.getX(), loc.getY(), loc.getZ());
             m.setLabel(description, true);
             m.setMarkerIcon(icon);
@@ -234,14 +271,16 @@ public class Fields {
     /*
      * Handle specific Field as an Area
      */
-    private void handleFieldArea(World world, Field field, Map<String, AreaMarker> newmap) {
+    private void handleFieldArea(World world, Field field, Map<String, AreaMarker> newmap)
+    {
 
         String field_id = field.getId() + "_area";
         //Do this up here in case we're toggling fields
         AreaMarker m = resareas.remove(field_id);
 
         //If we're not showing this
-        if (!field.hasFlag(FieldFlag.DYNMAP_AREA)) {
+        if (!field.hasFlag(FieldFlag.DYNMAP_AREA))
+        {
             return;
         }
         /*
@@ -269,12 +308,16 @@ public class Fields {
         /*
          * Existing area?
          */
-        if (m == null) {
+        if (m == null)
+        {
             m = markerSet.createAreaMarker(field_id, name, false, world.getName(), x, z, false);
-            if (m == null) {
+            if (m == null)
+            {
                 return;
             }
-        } else {
+        }
+        else
+        {
             m.setCornerLocations(x, z); /*
              * Replace corner locations
              */
@@ -282,17 +325,17 @@ public class Fields {
              * Update label
              */
         }
-        if (use3d) { /*
+        if (use3d)
+        { /*
              * If 3D?
              */
             m.setRangeY(field.getMiny() + 1.0, field.getMaxy());
         }
 
 
-
         /*
-         * Set popup
-         */
+        * Set popup
+        */
         m.setDescription(getFieldPopup(m, field));
 
         /*
@@ -301,18 +344,17 @@ public class Fields {
         addStyle(m, field);
 
 
-
         /*
-         * Add to map
-         */
+        * Add to map
+        */
         newmap.put(field_id, m);
 
     }
 
 
-    private void updateMarkerSet() {
+    private void updateMarkerSet()
+    {
         Map<String, AreaMarker> newmap = new HashMap<String, AreaMarker>();
-        Map<String, Marker> newMarkers = new HashMap<String, Marker>();
 
         /*
          *
@@ -321,20 +363,20 @@ public class Fields {
 
         ForceFieldManager ffm = plugin.getPreciousStones().getForceFieldManager();
 
-
-        for (World world : plugin.getServer().getWorlds()) {
+        for (World world : plugin.getServer().getWorlds())
+        {
             List<Field> fields = ffm.getFields("*", world);
-            for (Field f : fields) {
+            for (Field f : fields)
+            {
                 handleFieldArea(world, f, newmap);
-               // handleFieldIcon(world, f, newMarkers);
             }
         }
-
 
         /*
          * Now, review old map - anything left is gone
          */
-        for (AreaMarker oldm : resareas.values()) {
+        for (AreaMarker oldm : resareas.values())
+        {
             oldm.deleteMarker();
         }
 
@@ -344,22 +386,13 @@ public class Fields {
          */
         resareas.clear();
         resareas = newmap;
-
-        /*for (Marker oldMarker : markers.values()) {
-            oldMarker.deleteMarker();
-        }
-
-        // clean and replace the marker set
-
-        markers.clear();
-        markers = newMarkers;
-*/
     }
     /*
      * This class borrowed from Dynmap-WorldGuard. Thanks!
      */
 
-    private static class FieldStyle {
+    private static class FieldStyle
+    {
 
         String strokecolor;
         double strokeopacity;
@@ -370,7 +403,8 @@ public class Fields {
         String marker_text_format;
         String icon;
 
-        FieldStyle(FileConfiguration cfg, String path) {
+        FieldStyle(FileConfiguration cfg, String path)
+        {
             strokecolor = cfg.getString(path + ".strokeColor", "#FF0000");
             strokeopacity = cfg.getDouble(path + ".strokeOpacity", 0.8);
             strokeweight = cfg.getInt(path + ".strokeWeight", 3);
@@ -381,14 +415,15 @@ public class Fields {
             icon = cfg.getString(path + ".icon", "");
         }
 
-        FieldStyle(FileConfiguration cfg, String path, FieldStyle def) {
+        FieldStyle(FileConfiguration cfg, String path, FieldStyle def)
+        {
             strokecolor = cfg.getString(path + ".strokeColor", def.strokecolor);
             strokeopacity = cfg.getDouble(path + ".strokeOpacity", def.strokeopacity);
             strokeweight = cfg.getInt(path + ".strokeWeight", def.strokeweight);
             fillcolor = cfg.getString(path + ".fillColor", def.fillcolor);
             fillopacity = cfg.getDouble(path + ".fillOpacity", def.fillopacity);
             area_text_format = cfg.getString(path + ".area_text", def.area_text_format);
-            marker_text_format= cfg.getString(path + ".marker_text", def.marker_text_format);
+            marker_text_format = cfg.getString(path + ".marker_text", def.marker_text_format);
             icon = cfg.getString(path + ".icon", def.icon);
         }
     }

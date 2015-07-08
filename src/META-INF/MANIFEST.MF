@@ -1,4 +1,4 @@
 Manifest-Version: 1.0
-Main-Class: net.sacredlabyrinth.phaed.dynmap.simpleclans.DynmapSimpleC
- lans
+Main-Class: net.sacredlabyrinth.phaed.dynmap.preciousstones.DynmapPrec
+ iousStones
 
