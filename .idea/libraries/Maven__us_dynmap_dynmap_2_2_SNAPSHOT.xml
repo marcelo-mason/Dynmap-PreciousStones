@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: us.dynmap:dynmap:2.2-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/us/dynmap/dynmap/2.2-SNAPSHOT/dynmap-2.2-20150708.184723-1.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/us/dynmap/dynmap/2.2-SNAPSHOT/dynmap-2.2-20150708.184723-1-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/us/dynmap/dynmap/2.2-SNAPSHOT/dynmap-2.2-20150708.184723-1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
